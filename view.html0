@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>View Users</title>
+  <style>
+    table {
+      width: 80%;
+      margin: 30px auto;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">User Submissions</h2>
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Submitted At</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data will be loaded here -->
+    </tbody>
+  </table>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import {
+      getFirestore,
+      collection,
+      getDocs,
+      deleteDoc,
+      doc
+    } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+  apiKey: "AIzaSyDrGD6L8kfXKkqEVSQTjgzXfjmJPM2q3GE",
+  authDomain: "cole-walk.firebaseapp.com",
+  projectId: "cole-walk",
+  storageBucket: "cole-walk.firebasestorage.app",
+  messagingSenderId: "852714390021",
+  appId: "1:852714390021:web:2408a3fb84f696192fd26c",
+  measurementId: "G-B6XWL5XK8E"
+};
+
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const tableBody = document.querySelector("#userTable tbody");
+
+    async function loadUsers() {
+      tableBody.innerHTML = ""; // Clear table
+      const snapshot = await getDocs(collection(db, "users"));
+      snapshot.forEach(docSnap => {
+        const data = docSnap.data();
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${data.name}</td>
+          <td>${data.email}</td>
+          <td>${new Date(data.timestamp?.seconds * 1000).toLocaleString()}</td>
+          <td><button onclick="deleteUser('${docSnap.id}')">Delete</button></td>
+        `;
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    window.deleteUser = async function (id) {
+      if (confirm("Are you sure you want to delete this user?")) {
+        await deleteDoc(doc(db, "users", id));
+        alert("User deleted");
+        loadUsers(); // Refresh table
+      }
+    };
+
+    loadUsers(); // Initial load
+  </script>
+</body>
+</html>
