@@ -1,50 +1,56 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Submit Data</title>
+  <meta charset="UTF-8">
+  <title>Form to Firebase</title>
+</head>
+<body>
+  <h2>User Info Form</h2>
+  <form id="userForm">
+    <input type="text" id="name" placeholder="Name" required /><br><br>
+    <input type="email" id="email" placeholder="Email" required /><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
   <script type="module">
-    // Import Firebase modules
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    // Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
 
     const firebaseConfig = {
-  apiKey: "AIzaSyActi9_qJAaljNSTwJ0d5PO6HK42b2JxAs",
-  authDomain: "cole-dog-walking-data.firebaseapp.com",
-  projectId: "cole-dog-walking-data",
-  storageBucket: "cole-dog-walking-data.firebasestorage.app",
-  messagingSenderId: "30148878583",
-  appId: "1:30148878583:web:23520ca670d929a903b3f2",
-  measurementId: "G-QYQ3PXQRR4"
+  apiKey: "AIzaSyDrGD6L8kfXKkqEVSQTjgzXfjmJPM2q3GE",
+  authDomain: "cole-walk.firebaseapp.com",
+  projectId: "cole-walk",
+  storageBucket: "cole-walk.firebasestorage.app",
+  messagingSenderId: "852714390021",
+  appId: "1:852714390021:web:2408a3fb84f696192fd26c",
+  measurementId: "G-B6XWL5XK8E"
 };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    async function handleSubmit(e) {
+    const form = document.getElementById("userForm");
+
+    form.addEventListener("submit", async (e) => {
       e.preventDefault();
+
       const name = document.getElementById("name").value;
       const email = document.getElementById("email").value;
 
       try {
-        await addDoc(collection(db, "submissions"), { name, email });
+        await addDoc(collection(db, "users"), {
+          name: name,
+          email: email,
+          timestamp: new Date()
+        });
         alert("Submitted!");
-        document.getElementById("dataForm").reset();
-      } catch (err) {
-        console.error("Error adding document: ", err);
+        form.reset();
+      } catch (error) {
+        console.error("Error adding document: ", error);
+        alert("Submission failed");
       }
-    }
-
-    window.onload = () => {
-      document.getElementById("dataForm").addEventListener("submit", handleSubmit);
-    };
+    });
   </script>
-</head>
-<body>
-  <h2>Submit Info</h2>
-  <form id="dataForm">
-    <input type="text" id="name" placeholder="Your Name" required />
-    <input type="email" id="email" placeholder="Your Email" required />
-    <button type="submit">Submit</button>
-  </form>
 </body>
 </html>
